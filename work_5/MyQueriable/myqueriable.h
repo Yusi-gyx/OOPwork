@@ -8,7 +8,7 @@ class MyQueriable {
 public:
     MyQueriable where(std::function<bool(T)> f);
     MyQueriable apply(std::function<T(T)> f);
-    T sum();
+    T sum() const;
     class iterator{
         T* ptr;
     public:
@@ -87,7 +87,7 @@ MyQueriable<T> MyQueriable<T>::apply(std::function<T(T)> f)
 }
 
 template<typename T>
-T MyQueriable<T>::sum()
+T MyQueriable<T>::sum() const
 {
     T result = 0 ;
     for(auto x: arr)
