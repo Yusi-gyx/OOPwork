@@ -2,17 +2,6 @@
 #include <vector>
 #include <functional>
 
-
-//前置声明
-template <typename T>
-class MyQueriable;
-
-template<typename U, size_t N>
-MyQueriable<U> from(const U (&container)[N]);
-
-template<typename U>
-MyQueriable<U> from(const std::vector<U>& container);
-
 template <typename T>
 class MyQueriable
 {
@@ -54,13 +43,6 @@ public:
 
     auto begin() {return arr.begin();}
     auto end() {return arr.end();}
-
-    //类内声明友元
-    template<typename U, size_t N>
-    friend MyQueriable<U> from(const U (&container)[N]);
-
-    template<typename U>
-    friend MyQueriable<U> from(const std::vector<U>& container);
 };
 
 //类外进行实现
