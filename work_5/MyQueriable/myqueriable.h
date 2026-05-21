@@ -2,97 +2,86 @@
 #include <vector>
 #include <functional>
 
-template<typename T>
-class MyQueriable {   
+
+//前置声明
+template <typename T>
+class MyQueriable;
+
+template<typename U, size_t N>
+MyQueriable<U> from(const U (&container)[N]);
+
+template<typename U>
+MyQueriable<U> from(const std::vector<U>& container);
+
+template <typename T>
+class MyQueriable
+{
     std::vector<T> arr;
+
 public:
-    MyQueriable where(std::function<bool(T)> f);
-    MyQueriable apply(std::function<T(T)> f);
-    T sum() const;
-    class iterator{
-        T* ptr;
-    public:
-        iterator(T* p): ptr(p) {}
-        T& operator*() {return *ptr;}
-        iterator& operator++() 
+    MyQueriable() = default;
+    MyQueriable(const std::vector<T>& obj): arr(obj) {}
+    MyQueriable<T> where(std::function<bool(T)> f)
+    {
+        MyQueriable<T> temp;
+        for (auto x : arr)
         {
-            ptr ++;
-            return *this;
+            if (f(x))
+                temp.arr.push_back(x);
         }
-        bool operator!=(const iterator& other){return ptr != other.ptr;}
-        //这里不需要重载其他符号和函数（这个题没有用到）
-    };
-
-    iterator begin() 
-    {
-        return arr.data();
-    }
-    iterator end() 
-    {
-        return arr.data() + arr.size();
+        return temp;
     }
 
-    std::vector<T>& transform() {return arr;} 
-    //返回引用时不要用取地址符，这将返回一个指针
+    MyQueriable<T> apply(std::function<T(T)> f)
+    {
+        MyQueriable<T> temp;
+        for (auto x : arr)
+        {
+            temp.arr.push_back(f(x));
+        }
+        return temp;
+    }
 
-    //这里的友元函数需要是模板函数，但是注意参数类型的名称要和模板类的不一样
+    T sum() const
+    {
+        T result = 0;
+        for (auto x : arr)
+        {
+            result += x;
+        }
+        return result;
+    }
+
+    auto begin() {return arr.begin();}
+    auto end() {return arr.end();}
+
+    //类内声明友元
     template<typename U, size_t N>
-    friend MyQueriable<U> from(const T (&container)[N]);
+    friend MyQueriable<U> from(const U (&container)[N]);
+
     template<typename U>
-    friend MyQueriable<U> from(const std::vector<T>& container);
+    friend MyQueriable<U> from(const std::vector<U>& container);
 };
 
-template<typename T, size_t N>
-MyQueriable<T> from(const T (&container)[N])
+//类外进行实现
+template<typename U, size_t N>
+MyQueriable<U> from(const U (&container)[N])
 {
-    MyQueriable<T> temp;
-    for(auto x: container)
+    std::vector<U> temp;
+    for (auto x : container)
     {
-        temp.transform().push_back(x);
+        temp.push_back(x);
     }
-    return temp ;
+    return MyQueriable<U>(temp);
 }
 
-template<typename T>
-MyQueriable<T> from(const std::vector<T>& container)
+template<typename U>
+MyQueriable<U> from(const std::vector<U>& container)
 {
-    MyQueriable<T> temp;
-    for(auto x: container)
+    std::vector<U> temp;
+    for (auto x : container)
     {
-        temp.transform().push_back(x);
+        temp.push_back(x);
     }
-    return temp ;
-}
-
-template<typename T>
-MyQueriable<T> MyQueriable<T>::where(std::function<bool(T)> f)
-{
-    MyQueriable<T> temp;
-    for(auto x: arr)
-    {
-        if(f(x)) temp.transform().push_back(x);
-    }
-    return temp;
-}
-
-template<typename T>
-MyQueriable<T> MyQueriable<T>::apply(std::function<T(T)> f)
-{
-    MyQueriable<T> temp;
-    for(auto x: arr)
-    {
-        temp.transform().push_back(f(x));
-    }
-    return temp;
-}
-
-template<typename T>
-T MyQueriable<T>::sum() const
-{
-    T result = 0 ;
-    for(auto x: arr)
-    {
-        result += x;
-    }
-    return result;
+    return MyQueriable<U>(temp);
 }
