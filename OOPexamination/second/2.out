@@ -1,0 +1,6 @@
+1 0
+0 1
+rules new-rules
+#0 [system] (3) rules
+#1 [user] (5) ask
+#2 [assistant] (7) answer
